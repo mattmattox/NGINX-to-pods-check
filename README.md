@@ -12,12 +12,44 @@ bash ./check.sh
 ## Example output
 
 ### Broken pod
+
 ```
+bash ./check.sh -F Table
+####################################################
+Pod: webserver-bad-85cf9ccdf8-8v4mh
+PodIP: 10.42.0.252
+Port: 80
+Endpoint: ingress-1d8af467b8b7c9682fda18c8d5053db7
+Ingress: test-bad
+Ingress Pod: nginx-ingress-controller-b2s2d
+Node: a1ubphylbp01
+Status: Fail!
+####################################################
+```
+
+```
+bash ./check.sh -F Inline
 Checking Pod webserver-bad-8v4mh PodIP 10.42.0.252 on Port 80 in endpoint ingress-bad for ingress test-bad from nginx-ingress-controller-b2s2d on node a1ubphylbp01 NOK
 ```
 
 ### Working pod
+
 ```
+bash ./check.sh -F Table
+####################################################
+Pod: webserver-bad-85cf9ccdf8-8v4mh
+PodIP: 10.42.0.252
+Port: 80
+Endpoint: ingress-1d8af467b8b7c9682fda18c8d5053db7
+Ingress: test-bad
+Ingress Pod: nginx-ingress-controller-b2s2d
+Node: a1ubphylbp01
+Status: Pass!
+####################################################
+```
+
+```
+bash ./check.sh -F Inline
 Checking Pod webserver-good-65644cffd4-gbpkj PodIP 10.42.0.251 on Port 80 in endpoint ingress-good for ingress test-good from nginx-ingress-controller-b2s2d on node a1ubphylbp01 OK
 ```
 
