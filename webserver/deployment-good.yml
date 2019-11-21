@@ -1,0 +1,59 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    cattle.io/creator: norman
+    workload.user.cattle.io/workloadselector: deployment-webserver-good
+  name: webserver-good
+  namespace: default
+spec:
+  selector:
+    matchLabels:
+      workload.user.cattle.io/workloadselector: deployment-webserver-good
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        workload.user.cattle.io/workloadselector: deployment-webserver-good
+    spec:
+      containers:
+      - name: webserver-good
+        image: cube8021/test-webserver
+        imagePullPolicy: Always
+
+---
+apiVersion: v1
+kind: Service
+metadata: 
+  labels: 
+    workload.user.cattle.io/workloadselector: deployment-webserver-good
+  name: deployment-webserver-good
+  namespace: default
+spec:
+  ports:
+  - name: "80"
+    port: 80
+    targetPort: 80
+  selector:
+    workload.user.cattle.io/workloadselector: deployment-webserver-good
+
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: webserver-good
+  namespace: default
+spec:
+  rules:
+  - host: webserver-good.local
+    http:
+      paths:
+      - backend:
+          serviceName: deployment-webserver-good
+          servicePort: 80
+        path: /
