@@ -15,19 +15,17 @@ do
 			do
 				kubectl -n ingress-nginx get pods -l app=ingress-nginx -o custom-columns=POD:.metadata.name,NODE:.spec.nodeName,IP:.status.podIP --no-headers | while read ingresspod nodename podip
 				do
-					PODNAME="$(kubectl get pods -n $namespace -o custom-columns=POD:.metadata.name,IP:.status.podIP --no-headers | grep "$endpointpodip" | tr -d ' ')"
-					tput setaf 7; echo -n "Checking $PODNAME PodIP $endpointpodip in endpoint $servicename for ingress $ingress from $ingresspod on node $nodename "
-					kubectl -n ingress-nginx exec $ingresspod -- curl -o /dev/null --connect-timeout 5 -s http://${endpointpodip}:${PORT}; RC=$?
-					if [ $RC -ne 0 ]
+					PODNAME="$(kubectl get pods -n $namespace -o custom-columns=POD:.metadata.name,IP:.status.podIP --no-headers | grep "$endpointpodip" | awk '{print $1}' | tr -d ' ')"
+					tput setaf 7; echo -n "Checking Pod $PODNAME PodIP $endpointpodip on Port $PORT in endpoint $servicename for ingress $ingress from $ingresspod on node $nodename "; tput sgr0
+					if ! kubectl -n ingress-nginx exec $ingresspod -- curl -o /dev/null --connect-timeout 5 -s -q http://${endpointpodip}:${PORT} &> /dev/null
 					then
-						tput setaf 1; echo "NOK"
+						tput setaf 1; echo "NOK"; tput sgr0
 					else
-						tput setaf 2; echo "OK"
+						tput setaf 2; echo "OK"; tput sgr0
 					fi
 				done
 			done
 		done
 	done
 done
-tput sgr0
 
